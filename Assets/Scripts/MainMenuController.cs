@@ -12,6 +12,11 @@ public class MainMenuController : MonoBehaviour
 
     public void AuthorButtonListener()
     {
-        Debug.Log("PONG GAME By Ahmad Tuflihun");
+        Debug.Log("Created by Ahmad Tuflihun - 149251970101-194");
+    }
+
+    public void QuitGameListener()
+    {
+        Application.Quit();
     }
 }

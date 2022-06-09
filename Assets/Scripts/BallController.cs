@@ -1,10 +1,10 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class BallController : MonoBehaviour
 {
     public Vector2 speed = new Vector2(1, 1);
+    public Vector2 resetPosition = new Vector2(1, 1);
+
     private Rigidbody2D rig;
 
     void Start()
@@ -13,4 +13,8 @@ public class BallController : MonoBehaviour
         rig.velocity = speed;
     }
 
+    public void ResetBallPosition()
+    {
+        transform.position = resetPosition;
+    }
 }

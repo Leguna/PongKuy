@@ -17,6 +17,7 @@ public class PaddleController : MonoBehaviour
 
     private void Update()
     {
+        Debug.Log(this.name + " " + this.rig.velocity);
         MoveObject(GetInput());
     }
 
@@ -36,6 +37,6 @@ public class PaddleController : MonoBehaviour
 
     private void MoveObject(Vector2 movement)
     {
-        transform.Translate(movement * Time.deltaTime);
+        rig.velocity = movement;
     }
 }
