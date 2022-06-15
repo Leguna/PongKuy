@@ -15,6 +15,7 @@ public class PowerUpManager : MonoBehaviour
     private float timer;
 
 
+    [SerializeField]
     private List<GameObject> powerUpList;
 
     private void Start()
@@ -75,5 +76,7 @@ public class PowerUpManager : MonoBehaviour
             RemovePowerUp(powerUpList[0]);
         }
     }
+
+
 
 }

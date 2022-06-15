@@ -3,10 +3,16 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
+enum PowerUpType { BallSpeed, PaddleLength, PaddleSpeed };
+
 public class PowerUpController : MonoBehaviour
 {
+
     public Collider2D colliderTarget;
     public float timeToRemove = 10;
+
+    [SerializeField]
+    PowerUpType myType;
 
     public UnityEvent onTriggerCallback;
     public UnityEvent onRemoveCallback;
@@ -25,6 +31,7 @@ public class PowerUpController : MonoBehaviour
         if (collision == colliderTarget)
         {
             onTriggerCallback.Invoke();
+            onRemoveCallback.Invoke();
         }
     }
 
