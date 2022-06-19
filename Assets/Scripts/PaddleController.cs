@@ -1,6 +1,7 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+
+public enum PlayerType { LeftPaddle = 1, RightPaddle = 2 };
 
 public class PaddleController : MonoBehaviour
 {
@@ -12,6 +13,10 @@ public class PaddleController : MonoBehaviour
     public KeyCode upKey;
     public KeyCode downKey;
     private Rigidbody2D rig;
+
+    public PlayerType playerType;
+
+    public int timer = 5;
 
     public void SetPaddleSpeedToDefault() => speed = defaultSpeed;
     public void SetPaddleLengthToDefault() => transform.localScale = new Vector3(transform.localScale.x, defaultScale, transform.localScale.z);
@@ -33,13 +38,11 @@ public class PaddleController : MonoBehaviour
     {
         defaultSpeed = speed;
         defaultScale = transform.localScale.y;
-        Debug.Log(defaultScale);
         rig = GetComponent<Rigidbody2D>();
     }
 
     private void Update()
     {
-        Debug.Log(name + " " + rig.velocity);
         MoveObject(GetInput());
     }
 
@@ -57,17 +60,23 @@ public class PaddleController : MonoBehaviour
         return Vector2.zero;
     }
 
-    private void MoveObject(Vector2 movement)
+    private void MoveObject(Vector2 movement) => rig.velocity = movement;
+
+    public void PowerUpLength(int playerType)
     {
-        rig.velocity = movement;
+        if (this.playerType == (PlayerType)playerType)
+        {
+            StartCoroutine(MultiplyPaddleLengthByTwo(timer));
+        }
     }
 
-    public void PowerUpLength(int timer) { 
-        StartCoroutine(MultiplyPaddleLengthByTwo(timer));
+    public void PowerUpSpeed(int playerType)
+    {
+        if (this.playerType == (PlayerType)playerType)
+        {
+            StartCoroutine(MultiplyPaddleSpeedByTwo(timer));
+        }
     }
 
-    public void PowerUpSpeed(int timer)
-    {
-        StartCoroutine(MultiplyPaddleSpeedByTwo(timer));
-    }
+    public void SetTimer(int timeInSecond) => timer = timeInSecond;
 }

@@ -1,6 +1,7 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+
+public enum TargetPowerUp { None = 0, LeftPaddle = 1, RightPaddle = 2, Ball = 3};
 
 public class PowerUpManager : MonoBehaviour
 {
@@ -14,9 +15,8 @@ public class PowerUpManager : MonoBehaviour
     public int spawnInterval = 3;
     private float timer;
 
-
-    [SerializeField]
-    private List<GameObject> powerUpList;
+    public TargetPowerUp targetPowerUp;
+    [SerializeField] private List<GameObject> powerUpList;
 
     private void Start()
     {
@@ -77,6 +77,27 @@ public class PowerUpManager : MonoBehaviour
         }
     }
 
+    public void SetTargetPowerUp(int target)
+    {
+        switch ((TargetPowerUp)target)
+        {
+            case (TargetPowerUp.None):
+                targetPowerUp = TargetPowerUp.None;
+                break;
+            case (TargetPowerUp.LeftPaddle):
+                targetPowerUp = TargetPowerUp.LeftPaddle;
+                break;
+            case (TargetPowerUp.RightPaddle):
+                targetPowerUp = TargetPowerUp.RightPaddle;
+                break;
+            case (TargetPowerUp.Ball):
+                targetPowerUp = TargetPowerUp.Ball;
+                break;
+        }
+    }
 
-
+    public void SetTargetPowerUpByType(TargetPowerUp target)
+    {
+        targetPowerUp = target;
+    }
 }

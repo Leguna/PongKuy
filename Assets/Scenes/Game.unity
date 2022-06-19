@@ -221,7 +221,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   colliderTarget: {fileID: 1067853654}
   timeToRemove: 10
-  myType: 0
+  powerUpType: 0
+  powerUpManager: {fileID: 392683352}
   onTriggerCallback:
     m_PersistentCalls:
       m_Calls:
@@ -410,6 +411,8 @@ MonoBehaviour:
   speed: 4
   upKey: 273
   downKey: 274
+  playerType: 2
+  timer: 5
 --- !u!61 &197505996
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -768,14 +771,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   colliderTarget: {fileID: 1067853654}
   timeToRemove: 5
-  myType: 0
+  powerUpType: 0
+  powerUpManager: {fileID: 392683352}
   onTriggerCallback:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1768319972}
         m_TargetAssemblyTypeName: PaddleController, Assembly-CSharp
         m_MethodName: PowerUpSpeed
-        m_Mode: 3
+        m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -787,7 +791,7 @@ MonoBehaviour:
       - m_Target: {fileID: 197505995}
         m_TargetAssemblyTypeName: PaddleController, Assembly-CSharp
         m_MethodName: PowerUpSpeed
-        m_Mode: 3
+        m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -978,6 +982,7 @@ MonoBehaviour:
   powerUpAreaMin: {x: -7, y: -4}
   powerUpAreaMax: {x: 7, y: 2.5}
   spawnInterval: 3
+  targetPowerUp: 0
   powerUpList: []
 --- !u!1 &646249085
 GameObject:
@@ -1508,6 +1513,38 @@ MonoBehaviour:
   velocity: {x: 2, y: 2}
   speed: 2
   resetPosition: {x: 0, y: 0}
+  leftPaddle: {fileID: 1768319969}
+  rightPaddle: {fileID: 197505992}
+  onRightPaddleTouch:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 392683352}
+        m_TargetAssemblyTypeName: PowerUpManager, Assembly-CSharp
+        m_MethodName: SetTargetPowerUp
+        m_Mode: 3
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 2
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  onLeftPaddleTouch:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 392683352}
+        m_TargetAssemblyTypeName: PowerUpManager, Assembly-CSharp
+        m_MethodName: SetTargetPowerUp
+        m_Mode: 3
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 1
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!50 &1067853653
 Rigidbody2D:
   serializedVersion: 4
@@ -2264,6 +2301,8 @@ MonoBehaviour:
   speed: 4
   upKey: 119
   downKey: 115
+  playerType: 1
+  timer: 5
 --- !u!61 &1768319973
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -2563,18 +2602,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   colliderTarget: {fileID: 1067853654}
   timeToRemove: 5
-  myType: 0
+  powerUpType: 1
+  powerUpManager: {fileID: 392683352}
   onTriggerCallback:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1768319972}
         m_TargetAssemblyTypeName: PaddleController, Assembly-CSharp
         m_MethodName: PowerUpLength
-        m_Mode: 3
+        m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 5
+          m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
@@ -2582,11 +2622,11 @@ MonoBehaviour:
       - m_Target: {fileID: 197505995}
         m_TargetAssemblyTypeName: PaddleController, Assembly-CSharp
         m_MethodName: PowerUpLength
-        m_Mode: 3
+        m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 5
+          m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0

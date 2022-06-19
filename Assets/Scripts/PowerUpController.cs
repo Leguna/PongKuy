@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -7,20 +5,19 @@ enum PowerUpType { BallSpeed, PaddleLength, PaddleSpeed };
 
 public class PowerUpController : MonoBehaviour
 {
-
     public Collider2D colliderTarget;
-    public float timeToRemove = 10;
+    [SerializeField] private float timeToRemove = 10;
 
-    [SerializeField]
-    PowerUpType myType;
+    [SerializeField] private PowerUpType powerUpType;
 
-    public UnityEvent onTriggerCallback;
-    public UnityEvent onRemoveCallback;
+    [SerializeField] private PowerUpManager powerUpManager;
+    [SerializeField] private UnityEvent<int> onTriggerCallback;
+    [SerializeField] private UnityEvent onRemoveCallback;
 
     private void Update()
     {
         timeToRemove -= Time.deltaTime;
-        if(timeToRemove <= 0)
+        if (timeToRemove <= 0)
         {
             onRemoveCallback.Invoke();
         }
@@ -28,9 +25,9 @@ public class PowerUpController : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision == colliderTarget)
+        if (colliderTarget==collision)
         {
-            onTriggerCallback.Invoke();
+            onTriggerCallback.Invoke((int)powerUpManager.targetPowerUp);
             onRemoveCallback.Invoke();
         }
     }
