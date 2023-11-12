@@ -7,7 +7,7 @@
         {
             MenuScene = 0,
             GameScene = 1,
-            LoadingScreen = 2,
+            LoadingScreen = 2
         }
     }
 }

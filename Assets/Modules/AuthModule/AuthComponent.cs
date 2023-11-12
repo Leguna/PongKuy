@@ -44,16 +44,6 @@ namespace AuthModule
             SetState(AuthState.None);
         }
 
-        private void OnGUI()
-        {
-            // Logout
-            if (GUI.Button(new Rect(10, 10, 100, 30), "Logout"))
-            {
-                authService.SignOut();
-            }
-        }
-
-
         public void SetState(AuthState newAuthState)
         {
             authState = newAuthState;

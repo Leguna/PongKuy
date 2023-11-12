@@ -18,38 +18,47 @@ namespace AuthModule
         {
             this.onSignedIn = onSignedIn;
             this.onSignedOut = onSignedOut;
-            AuthenticationService.Instance.SignedIn += async () =>
-            {
-                try
-                {
-                    if (isLoading) return;
-                    isLoading = true;
-                    var playerName = await AuthenticationService.Instance.GetPlayerNameAsync();
-                    ToastSystem.Show($"Player signed in. Welcome! {playerName}", 3f);
-                    onSignedIn?.Invoke();
-                    isLoading = false;
-                }
-                catch (Exception e)
-                {
-                    ToastSystem.Show(e.Message, 3f);
-                    isLoading = false;
-                }
-            };
 
-            AuthenticationService.Instance.SignInFailed += (err) => { ToastSystem.Show(err.Message, 3f); };
+            AuthenticationService.Instance.SignedIn += OnSignedIn;
+
+            AuthenticationService.Instance.SignInFailed += (err) => { ToastSystem.Show(err.Message); };
 
             AuthenticationService.Instance.SignedOut += () =>
             {
-                ToastSystem.Show("Player signed out.", 3f);
+                ToastSystem.Show("Player signed out.");
                 this.onSignedOut?.Invoke();
             };
 
             AuthenticationService.Instance.Expired += () =>
             {
-                ToastSystem.Show("Player session could not be refreshed and expired.", 3f);
+                ToastSystem.Show("Player session could not be refreshed and expired.");
             };
 
-            await IsSignedIn();
+            if (AuthenticationService.Instance.IsSignedIn)
+            {
+                OnSignedIn();
+                return;
+            }
+
+            await TrySignedInCached();
+        }
+
+        private async void OnSignedIn()
+        {
+            try
+            {
+                if (isLoading) return;
+                isLoading = true;
+                var playerName = await AuthenticationService.Instance.GetPlayerNameAsync();
+                ToastSystem.Show($"Player signed in. Welcome! {playerName}");
+                onSignedIn?.Invoke();
+                isLoading = false;
+            }
+            catch (Exception e)
+            {
+                ToastSystem.Show(e.Message);
+                isLoading = false;
+            }
         }
 
         public async void SignIn(string username, string password)
@@ -62,11 +71,11 @@ namespace AuthModule
             }
             catch (AuthenticationException ex)
             {
-                ToastSystem.Show(ex.Message, 3f);
+                ToastSystem.Show(ex.Message);
             }
             catch (RequestFailedException ex)
             {
-                ToastSystem.Show(ex.Message, 3f);
+                ToastSystem.Show(ex.Message);
             }
             finally
             {
@@ -74,9 +83,10 @@ namespace AuthModule
             }
         }
 
-        private async Task IsSignedIn()
+        private async Task TrySignedInCached()
         {
             if (!AuthenticationService.Instance.SessionTokenExists) return;
+            if (AuthenticationService.Instance.IsSignedIn) return;
 
             try
             {
@@ -84,10 +94,9 @@ namespace AuthModule
                 isLoading = true;
                 await AuthenticationService.Instance.SignInAnonymouslyAsync();
                 var playerName = await AuthenticationService.Instance.GetPlayerNameAsync();
-                ToastSystem.Show($"Player signed in. Welcome! {playerName}", 3f);
+                ToastSystem.Show($"Player signed in. Welcome! {playerName}");
                 Debug.Log($"PlayerID: {AuthenticationService.Instance.PlayerId}");
                 onSignedIn?.Invoke();
-                isLoading = false;
             }
             catch (AuthenticationException ex)
             {
@@ -97,6 +106,8 @@ namespace AuthModule
             {
                 Debug.LogException(ex);
             }
+
+            isLoading = false;
         }
 
         public async void SignUp(string displayName, string username, string password)
@@ -110,11 +121,11 @@ namespace AuthModule
             }
             catch (AuthenticationException ex)
             {
-                ToastSystem.Show(ex.Message, 3f);
+                ToastSystem.Show(ex.Message);
             }
             catch (RequestFailedException ex)
             {
-                ToastSystem.Show(ex.Message, 3f);
+                ToastSystem.Show(ex.Message);
             }
             finally
             {
@@ -137,7 +148,7 @@ namespace AuthModule
             }
             catch (Exception e)
             {
-                ToastSystem.Show(e.Message, 3f);
+                ToastSystem.Show(e.Message);
             }
         }
     }

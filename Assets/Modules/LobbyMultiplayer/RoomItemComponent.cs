@@ -1,3 +1,4 @@
+using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -11,12 +12,11 @@ namespace LobbyMultiplayer
         [SerializeField] private TMP_Text status;
         [SerializeField] private TMP_Text playerCount;
         [SerializeField] private Image lockIcon;
+        [SerializeField] private Button joinButton;
 
-        [HideInInspector] public LobbyData lobbyData;
-
-        public void SetData(LobbyData lobbyData)
+        public void SetData(LobbyData lobbyData, Action<string> onJoin)
         {
-            this.lobbyData = lobbyData;
+            joinButton.onClick.AddListener(() => onJoin?.Invoke(lobbyData.id));
             roomName.text = lobbyData.roomName;
             hostName.text = lobbyData.hostName;
             playerCount.text = $"{lobbyData.playerCount}/{lobbyData.maxPlayerCount}";
