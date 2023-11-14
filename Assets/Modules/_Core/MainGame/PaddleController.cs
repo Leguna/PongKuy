@@ -3,7 +3,11 @@ using UnityEngine;
 
 namespace MainGame
 {
-    public enum PlayerType { LeftPaddle = 1, RightPaddle = 2 };
+    public enum PlayerType
+    {
+        Left = 1,
+        Right = 2
+    };
 
     public class PaddleController : MonoBehaviour
     {
@@ -20,8 +24,17 @@ namespace MainGame
 
         public int timer = 5;
 
+        public void SetPaddleSpriteByPlayerType(PlayerType playerType)
+        {
+            this.playerType = playerType;
+            GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>($"Sprites/paddle{playerType}");
+        }
+
         public void SetPaddleSpeedToDefault() => speed = defaultSpeed;
-        public void SetPaddleLengthToDefault() => transform.localScale = new Vector3(transform.localScale.x, defaultScale, transform.localScale.z);
+
+        public void SetPaddleLengthToDefault() => transform.localScale =
+            new Vector3(transform.localScale.x, defaultScale, transform.localScale.z);
+
         public IEnumerator MultiplyPaddleSpeedByTwo(int timerInSeconds)
         {
             speed = defaultSpeed * 2;
@@ -31,7 +44,10 @@ namespace MainGame
 
         public IEnumerator MultiplyPaddleLengthByTwo(int timerInSeconds)
         {
-            transform.localScale = new Vector3(transform.localScale.x, transform.localScale.y * 2, transform.localScale.z);
+            var localScale = transform.localScale;
+            localScale =
+                new Vector3(localScale.x, localScale.y * 2, localScale.z);
+            transform.localScale = localScale;
             yield return new WaitForSeconds(timerInSeconds);
             SetPaddleLengthToDefault();
         }

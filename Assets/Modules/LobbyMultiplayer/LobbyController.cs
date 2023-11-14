@@ -56,8 +56,9 @@ namespace LobbyMultiplayer
 
         private void OnLoggedIn(string obj)
         {
-            lobbyList.Init(JoinByCode, OnRefresh, QuickJoin, CreateLobby, Close);
+            lobbyList.Init(JoinById, JoinByCode, RefreshLobby, QuickJoin, CreateLobby, Close);
             authComponent.SetState(AuthComponent.AuthState.None);
+            RefreshLobby();
         }
 
         private async void CreateLobby()
@@ -84,7 +85,8 @@ namespace LobbyMultiplayer
                 };
                 var lobby = await LobbyService.Instance.CreateLobbyAsync(lobbyName, maxPlayers, options);
                 lobbyData = new LobbyData().FromLobby(lobby);
-                OpenLobby(lobbyData);
+                OpenLobbyRoom(lobbyData);
+                StartHearthBeat();
             }
             catch (Exception e)
             {
@@ -93,7 +95,7 @@ namespace LobbyMultiplayer
             }
         }
 
-        private void OpenLobby(LobbyData lobbyData)
+        private void OpenLobbyRoom(LobbyData lobbyData)
         {
             lobbyList.Close();
             lobbyRoom.Open(lobbyData, UpdateLobby, PlayGame, LeaveRoom);
@@ -126,21 +128,43 @@ namespace LobbyMultiplayer
         {
             lobbyRoom.Close();
             lobbyList.Open();
+            LobbyService.Instance.DeleteLobbyAsync(lobbyData.id);
+            StopHearthBeat();
+        }
+
+        public async void JoinById(string id, string password = "")
+        {
+            try
+            {
+                var options = new JoinLobbyByIdOptions();
+                if (password != "")
+                    options.Password                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         = password;
+                var lobby = await LobbyService.Instance.JoinLobbyByIdAsync(id, options);
+                lobbyData = new LobbyData().FromLobby(lobby);
+                OpenLobbyRoom(lobbyData);
+            }
+            catch (Exception e)
+            {
+                ToastSystem.Show("Failed to join lobby");
+                Debug.LogError(e);
+            }
         }
 
         public async void JoinByCode(string code, string password = "")
         {
             try
             {
-                var options = new JoinLobbyByCodeOptions
-                {
-                    Password = password
-                };
-                await LobbyService.Instance.JoinLobbyByCodeAsync(code, options);
+                var options = new JoinLobbyByCodeOptions();
+                if (password != "")
+                    options.Password = password;
+                var lobby = await LobbyService.Instance.JoinLobbyByCodeAsync(code, options);
+                lobbyData = new LobbyData().FromLobby(lobby);
+                OpenLobbyRoom(lobbyData);
             }
             catch (Exception e)
             {
                 ToastSystem.Show("Failed to join lobby");
+                Debug.LogError(e);
             }
         }
 
@@ -154,10 +178,11 @@ namespace LobbyMultiplayer
             catch (LobbyServiceException e)
             {
                 ToastSystem.Show("Failed to quick join lobby");
+                Debug.LogException(e);
             }
         }
 
-        public async void OnRefresh()
+        public async void RefreshLobby()
         {
             try
             {
@@ -178,7 +203,32 @@ namespace LobbyMultiplayer
             catch (Exception e)
             {
                 ToastSystem.Show("Failed to refresh lobby list");
+                Debug.LogException(e);
             }
+        }
+
+        public void StartHearthBeat() => InvokeRepeating(nameof(SendHeartbeat), 0, 10);
+        public void StopHearthBeat() => CancelInvoke(nameof(SendHeartbeat));
+
+        public async void SendHeartbeat()
+        {
+            try
+            {
+                Debug.Log("Sending heartbeat");
+                await LobbyService.Instance.SendHeartbeatPingAsync(lobbyData.id);
+            }
+            catch (Exception e)
+            {
+                ToastSystem.Show("Failed to heartbeat");
+                Debug.LogException(e);
+            }
+        }
+
+        public void OnApplicationQuit()
+        {
+            StopHearthBeat();
+            if (lobbyData != null)
+                LobbyService.Instance.DeleteLobbyAsync(lobbyData.id);
         }
     }
 }

@@ -22,11 +22,14 @@ namespace LobbyMultiplayer
 
         public delegate void OnJoin(string lobbyId, string password);
 
-        private OnJoin onJoin;
+        private OnJoin onJoinByCode;
+        private OnJoin onJoinById;
 
-        public void Init(OnJoin onJoin, Action onRefresh, Action onQuickJoin, Action onCreate, Action onBack)
+        public void Init(OnJoin onJoinById, OnJoin onJoinByCode, Action onRefresh, Action onQuickJoin, Action onCreate,
+            Action onBack)
         {
-            this.onJoin = onJoin;
+            this.onJoinByCode = onJoinByCode;
+            this.onJoinById = onJoinById;
 
             backButton.onClick.RemoveAllListeners();
             refreshButton.onClick.RemoveAllListeners();
@@ -38,7 +41,7 @@ namespace LobbyMultiplayer
             refreshButton.onClick.AddListener(() => onRefresh?.Invoke());
             quickJoinButton.onClick.AddListener(() => onQuickJoin?.Invoke());
             createButton.onClick.AddListener(() => onCreate?.Invoke());
-            joinButton.onClick.AddListener(() => onJoin?.Invoke(lobbyNameInput.text, passwordInput.text));
+            joinButton.onClick.AddListener(() => onJoinByCode?.Invoke(lobbyNameInput.text, passwordInput.text));
         }
 
         public void UpdateRoomList(Lobby[] lobbyDatas)
@@ -51,13 +54,9 @@ namespace LobbyMultiplayer
             foreach (var lobbyData in lobbyDatas)
             {
                 var roomItem = Instantiate(roomItemPrefab, roomListContainer);
-                roomItem.SetData(new LobbyData().FromLobby(lobbyData), OnJoinCallback);
+                roomItem.SetData(new LobbyData().FromLobby(lobbyData),
+                    (lobbyId) => onJoinById?.Invoke(lobbyId, passwordInput.text));
             }
-        }
-
-        private void OnJoinCallback(string lobbyId)
-        {
-            onJoin?.Invoke(lobbyId, passwordInput.text);
         }
 
         public void Close()
