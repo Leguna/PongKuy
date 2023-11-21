@@ -1,46 +1,50 @@
+using Mirror;
 using UnityEngine;
-using UnityEngine.Events;
 
-public class BallController : MonoBehaviour
+namespace MainGame
 {
-    public Vector2 velocity = new Vector2(2, 2);
-    public float speed = 2f;
-    public Vector2 resetPosition = new Vector2(0, 0);
-
-    private Rigidbody2D rig;
-
-    public GameObject leftPaddle;
-    public GameObject rightPaddle;
-
-    public UnityEvent onRightPaddleTouch;
-    public UnityEvent onLeftPaddleTouch;
-
-    void Start()
+    public class BallController : NetworkBehaviour
     {
-        rig = GetComponent<Rigidbody2D>();
-        rig.velocity = velocity * speed;
-    }
+        public float startSpeed = 2f;
+        public Vector2 offset = new(0, 0);
 
-    public void ResetBallPosition()
-    {
-        transform.position = resetPosition;
-        rig.velocity = new Vector2(2f, 2f) * 2f;
-    }
+        public float speed = 2f;
+        private Rigidbody2D rigidbody2d;
 
-    public void SetSpeed(float speed)
-    {
-        rig.velocity *= speed;
-    }
-
-    private void OnCollisionEnter2D(Collision2D collision)
-    {
-        if (collision.gameObject == leftPaddle)
+        public override void OnStartServer()
         {
-            onLeftPaddleTouch.Invoke();
+            TryGetComponent(out rigidbody2d);
+            rigidbody2d.simulated = true;
         }
-        else if (collision.gameObject == rightPaddle)
+
+        public void ResetBallPosition(Transform parentTransform)
         {
-            onRightPaddleTouch.Invoke();
+            transform.SetParent(parentTransform);
+            transform.position = parentTransform.position + (Vector3)offset;
+        }
+
+        public void StartBallService()
+        {
+            var startVelocity = new Vector2(Random.Range(-1f, 1f), Random.Range(-1f, 1f)).normalized;
+            rigidbody2d.velocity = startVelocity * startSpeed;
+            transform.SetParent(null);
+        }
+
+        public void SetSpeed(float speed) => rigidbody2d.velocity *= speed;
+
+        private static float HitFactor(Vector2 ballPos, Vector2 racketPos, float racketHeight) =>
+            (ballPos.y - racketPos.y) / racketHeight;
+
+        [ServerCallback]
+        private void OnCollisionEnter2D(Collision2D col)
+        {
+            if (!col.transform.GetComponent<PaddleComponent>()) return;
+            var y = HitFactor(transform.position,
+                col.transform.position,
+                col.collider.bounds.size.y);
+            float x = col.relativeVelocity.x > 0 ? 1 : -1;
+            var dir = new Vector2(x, y).normalized;
+            rigidbody2d.velocity = dir * speed;
         }
     }
 }

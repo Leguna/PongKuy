@@ -1,13 +1,29 @@
+using System;
+using MirrorMultiplayerPong;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 namespace MainGame
 {
     public class GameManager : MonoBehaviour
     {
-        public void GotoMainMenu()
+        [SerializeField] private MyNetworkManager networkManager;
+        [SerializeField] private PaddleSpawner paddleSpawner;
+        [SerializeField] private BallController ballController;
+
+        public void Init(bool isMultiplayer, Action OnCancel = null)
         {
-            SceneManager.LoadScene(0);
+            
+            if (isMultiplayer)
+                networkManager.Init(OnCancel);
+            else
+                StartSinglePlayer();
+        }
+
+        private void StartSinglePlayer()
+        {
+            var paddleSpawnerPrefab = Resources.Load<PaddleSpawner>("Prefabs/PaddleSpawner");
+            paddleSpawner = Instantiate(paddleSpawnerPrefab);
+            paddleSpawner.SpawnPaddleSinglePlayer();
         }
     }
 }

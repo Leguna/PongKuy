@@ -1,7 +1,6 @@
-using LobbyMultiplayer;
-using ToC;
+using MainGame;
+using MirrorMultiplayerPong;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 namespace MainMenu
@@ -16,7 +15,7 @@ namespace MainMenu
         [SerializeField] private GameObject creditsPanel;
         [SerializeField] private GameObject mainMenuPanel;
 
-        [SerializeField] private LobbyController multiplayerController;
+        [SerializeField] private GameManager gameManager;
 
         private void Start()
         {
@@ -30,7 +29,7 @@ namespace MainMenu
         {
             creditsPanel.SetActive(false);
             mainMenuPanel.SetActive(false);
-            multiplayerController.Init(HomeButtonListener);
+            gameManager.Init(true, HomeButtonListener);
         }
 
         private void HomeButtonListener()
@@ -41,7 +40,9 @@ namespace MainMenu
 
         public void PlayGame()
         {
-            SceneManager.LoadScene(1);
+            mainMenuPanel.SetActive(false);
+            creditsPanel.SetActive(false);
+            gameManager.Init(false);
         }
 
         private void CreditsButtonListener()

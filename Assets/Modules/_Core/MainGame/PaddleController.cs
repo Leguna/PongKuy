@@ -3,12 +3,6 @@ using UnityEngine;
 
 namespace MainGame
 {
-    public enum PlayerType
-    {
-        Left = 1,
-        Right = 2
-    };
-
     public class PaddleController : MonoBehaviour
     {
         private float defaultScale = 2.5f;
