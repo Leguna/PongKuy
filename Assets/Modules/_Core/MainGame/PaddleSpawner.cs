@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Mirror;
 using UnityEngine;
 
@@ -46,6 +47,11 @@ namespace MainGame
         {
             SpawnPaddle(PlayerType.Left);
             SpawnPaddle(PlayerType.Right);
+        }
+
+        public void SetServePlayer(PlayerType playerType)
+        {
+            
         }
     }
 

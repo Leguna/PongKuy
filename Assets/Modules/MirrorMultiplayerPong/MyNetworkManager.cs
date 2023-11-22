@@ -9,6 +9,9 @@ namespace MirrorMultiplayerPong
 {
     public class MyNetworkManager : NetworkManager
     {
+        // Singleton
+        public static MyNetworkManager sin => singleton as MyNetworkManager;
+
         public PaddleSpawner paddleSpawner;
         [SerializeField] private JoinPanel joinPanel;
 
@@ -25,6 +28,7 @@ namespace MirrorMultiplayerPong
         {
             joinPanel.Hide();
             OnCancel?.Invoke();
+            NetworkServer.Shutdown();
         }
 
         public override void OnClientDisconnect()
@@ -49,6 +53,14 @@ namespace MirrorMultiplayerPong
             paddleSpawner = Instantiate(paddleSpawnerPrefab);
             NetworkServer.Spawn(paddleSpawner.gameObject);
             NetworkServer.RegisterHandler<CreatePaddleMessage>(OnCreatePaddle);
+        }
+
+        public override void OnServerAddPlayer(NetworkConnectionToClient conn)
+        {
+            if (paddleSpawner.paddles.Count != 2) return;
+            var ball = Instantiate(Resources.Load<BallController>("Prefabs/Ball"));
+            NetworkServer.Spawn(ball.gameObject);
+            NetworkServer.AddPlayerForConnection(conn, ball.gameObject);
         }
 
         private void OnHostServer()

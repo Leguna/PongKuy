@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 175809164585988450}
   - component: {fileID: 5468955071590877393}
   m_Layer: 0
-  m_Name: Bola
+  m_Name: Ball
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -103,9 +103,9 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
-  startVelocity: {x: -2, y: 2}
-  offset: {x: 0, y: 0}
-  speed: 2
+  startSpeed: 10
+  offset: {x: -1, y: 0}
+  speed: 10
 --- !u!50 &8924001769450299018
 Rigidbody2D:
   serializedVersion: 4
@@ -115,7 +115,7 @@ Rigidbody2D:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6832589429860852319}
   m_BodyType: 0
-  m_Simulated: 0
+  m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
   m_Mass: 0.0001

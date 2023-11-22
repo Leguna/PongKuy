@@ -1015,7 +1015,7 @@ GameObject:
   - component: {fileID: 229695748}
   m_Layer: 0
   m_Name: DindingAtas
-  m_TagString: Untagged
+  m_TagString: Wall
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 4294967295
@@ -1711,8 +1711,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   networkManager: {fileID: 1341239681}
-  paddleSpawner: {fileID: 2212308133511766152, guid: 8d8746cc4c98c2848b75637c96c70b26, type: 3}
-  ballController: {fileID: 0}
+  backButton: {fileID: 283520116}
 --- !u!114 &372624510
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4166,7 +4165,7 @@ GameObject:
   - component: {fileID: 1290763907}
   m_Layer: 0
   m_Name: Dinding
-  m_TagString: Untagged
+  m_TagString: Wall
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -4613,7 +4612,7 @@ GameObject:
   - component: {fileID: 1487729206}
   m_Layer: 0
   m_Name: DindingBawah
-  m_TagString: Untagged
+  m_TagString: Wall
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 4294967295

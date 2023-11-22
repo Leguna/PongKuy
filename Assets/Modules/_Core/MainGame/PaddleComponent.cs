@@ -1,4 +1,5 @@
-﻿using Mirror;
+﻿using System;
+using Mirror;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.EnhancedTouch;
@@ -20,6 +21,8 @@ namespace MainGame
         private const int Speed = 10;
         private PlayerType keyPlayerPressed;
 
+        public Action onService;
+
         [SerializeField] private float xPosition = 7.5f;
 
         private void Awake()
@@ -39,20 +42,20 @@ namespace MainGame
 
             inputAction.Player.PaddleLeft.performed += MovePaddleLeft;
             inputAction.Player.PaddleLeft.canceled += MovePaddleLeft;
-            inputAction.Player.Touch.performed += TouchMove;
-            inputAction.Player.Touch.canceled += TouchMove;
+
+            inputAction.Player.ServiceLeft.performed += ServiceLeft;
 
             if (isSinglePlayer)
                 if (playerType != PlayerType.Right)
                     return;
 
+            inputAction.Player.ServiceRight.performed += ServiceRight;
             inputAction.Player.PaddleRight.performed += MovePaddleRight;
             inputAction.Player.PaddleRight.canceled += MovePaddleRight;
         }
 
         private void Update()
         {
-            // Touch move read all touches 
             foreach (var touch in Touch.activeTouches)
             {
                 if (touch.phase is TouchPhase.Moved or TouchPhase.Stationary) continue;
@@ -70,39 +73,25 @@ namespace MainGame
             }
         }
 
-        private void ServiceRight(InputAction.CallbackContext obj)
-        {
-        }
+        private void ServiceRight(InputAction.CallbackContext obj) => Service(PlayerType.Right);
 
-        private void ServiceLeft(InputAction.CallbackContext obj)
-        {
-        }
+        private void ServiceLeft(InputAction.CallbackContext obj) => Service(PlayerType.Left);
 
-        private void Service()
+        public void Service(PlayerType playerType)
         {
-            Debug.Log("Service");
-        }
-
-        private void TouchMove(InputAction.CallbackContext obj)
-        {
-            // if (obj.valueType != typeof(Vector2) || obj.valueType != typeof(Single))
-            // {
-            //     rigidbody2D.velocity = Vector2.zero;
-            //     return;
-            // }
-            //
-            // var touchPositionVec2 = obj.ReadValue<Vector2>();
-            // var touchPosition = Camera.main.ScreenToWorldPoint(touchPositionVec2);
-            // var place = touchPosition.x < 0;
-            // keyPlayerPressed = place ? PlayerType.Left : PlayerType.Right;
-            // var isUp = touchPosition.y > 0;
-            //
-            // if (!isLocalPlayer && isSinglePlayer)
-            //     if (keyPlayerPressed != playerType)
-            //         return;
-            //
-            // if (obj.phase == InputActionPhase.Canceled) rigidbody2D.velocity = Vector2.zero;
-            // else rigidbody2D.velocity = isUp ? Vector2.up * Speed : Vector2.down * Speed;
+            Debug.Log("Service called from " + playerType);
+            if (isSinglePlayer)
+            {
+                onService?.Invoke();
+                Debug.Log("Service on single player");
+            }
+            else
+            {
+                if (!isLocalPlayer) return;
+                var msg = new ServiceMessage();
+                NetworkClient.Send(msg);
+                Debug.Log("Service from client");
+            }
         }
 
         private void MovePaddleLeft(InputAction.CallbackContext obj)
@@ -127,7 +116,7 @@ namespace MainGame
 
         public void SetType(PlayerType oldPlayerType, PlayerType newPlayerType)
         {
-            this.playerType = newPlayerType;
+            playerType = newPlayerType;
             var path = $"Sprites/paddle{newPlayerType}";
             spriteRenderer.sprite = Resources.Load<Sprite>(path);
             spriteRenderer.size = new Vector2(1, 1);
@@ -157,8 +146,8 @@ namespace MainGame
             inputAction.Player.PaddleRight.canceled -= MovePaddleRight;
             inputAction.Player.PaddleLeft.performed -= MovePaddleLeft;
             inputAction.Player.PaddleLeft.canceled -= MovePaddleLeft;
-            inputAction.Player.Touch.performed -= TouchMove;
-            inputAction.Player.Touch.canceled -= TouchMove;
+            inputAction.Player.ServiceLeft.performed -= ServiceLeft;
+            inputAction.Player.ServiceRight.performed -= ServiceRight;
             inputAction.Disable();
         }
 
@@ -166,5 +155,9 @@ namespace MainGame
         {
             DisableInput();
         }
+    }
+
+    internal struct ServiceMessage : NetworkMessage
+    {
     }
 }
