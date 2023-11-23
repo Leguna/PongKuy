@@ -36,13 +36,13 @@ namespace MainGame
 
         public void SetUpController()
         {
+            if (!isLocalPlayer && !isSinglePlayer) return;
             transformIdentity.enabled = true;
             inputAction = new PaddleInputAction();
             inputAction.Enable();
 
             inputAction.Player.PaddleLeft.performed += MovePaddleLeft;
             inputAction.Player.PaddleLeft.canceled += MovePaddleLeft;
-
             inputAction.Player.ServiceLeft.performed += ServiceLeft;
 
             if (isSinglePlayer)
@@ -108,9 +108,8 @@ namespace MainGame
 
         private void MovePaddle(float direction)
         {
-            if (!isLocalPlayer && isSinglePlayer)
-                if (!isSinglePlayer || playerType != keyPlayerPressed)
-                    return;
+            if (!isLocalPlayer && !isSinglePlayer) return;
+            if (isSinglePlayer && playerType != keyPlayerPressed) return;
             rigidbody2D.velocity = Vector2.up * direction * Speed;
         }
 
@@ -135,13 +134,13 @@ namespace MainGame
 
         public override void OnStopClient()
         {
-            base.OnStopClient();
             DisableInput();
-            Destroy(gameObject);
         }
 
         private void DisableInput()
         {
+            Debug.Log(gameObject.name);
+            if (!isLocalPlayer && !isSinglePlayer) return;
             inputAction.Player.PaddleRight.performed -= MovePaddleRight;
             inputAction.Player.PaddleRight.canceled -= MovePaddleRight;
             inputAction.Player.PaddleLeft.performed -= MovePaddleLeft;
@@ -151,10 +150,7 @@ namespace MainGame
             inputAction.Disable();
         }
 
-        private void OnDisable()
-        {
-            DisableInput();
-        }
+        private void OnDisable() => DisableInput();
     }
 
     internal struct ServiceMessage : NetworkMessage

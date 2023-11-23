@@ -12,9 +12,11 @@ namespace MainGame
         private BallController ballController;
 
         [SerializeField] private Button backButton;
+        private Action onCancel;
 
         public void Init(bool isMultiplayer, Action OnCancel = null)
         {
+            onCancel = OnCancel;
             if (isMultiplayer)
                 MyNetworkManager.sin.Init(OnCancel);
             else
@@ -23,12 +25,6 @@ namespace MainGame
 
         private void StartSinglePlayer(Action onCancel)
         {
-            backButton.onClick.AddListener(() =>
-            {
-                onCancel?.Invoke();
-                Destroy(paddleSpawner.gameObject);
-                Destroy(ballController.gameObject);
-            });
             var paddleSpawnerPrefab = Resources.Load<PaddleSpawner>("Prefabs/PaddleSpawner");
             paddleSpawner = Instantiate(paddleSpawnerPrefab);
             paddleSpawner.SpawnPaddleSinglePlayer();
@@ -36,6 +32,18 @@ namespace MainGame
             ballController.Init(false);
             ballController.ResetBallPosition(paddleSpawner.paddles[0].transform, PlayerType.Left);
             paddleSpawner.paddles[0].onService += ballController.StartBallService;
+
+            backButton.gameObject.SetActive(true);
+            backButton.onClick.RemoveAllListeners();
+            backButton.onClick.AddListener(OnExitSinglePlayer);
+        }
+
+        private void OnExitSinglePlayer()
+        {
+            onCancel?.Invoke();
+            paddleSpawner.DestroyAll();
+            Destroy(ballController.gameObject);
+            backButton.gameObject.SetActive(false);
         }
     }
 }

@@ -26,6 +26,10 @@ namespace MirrorMultiplayerPong
             this.OnJoinServer = OnJoinServer;
             this.OnHostServer = OnHostServer;
             this.OnLeaveServer = OnLeaveServer;
+            hostButton.onClick.RemoveAllListeners();
+            joinButton.onClick.RemoveAllListeners();
+            leaveServerButton.onClick.RemoveAllListeners();
+            cancelButton.onClick.RemoveAllListeners();
             hostButton.onClick.AddListener(OnHostServer.Invoke);
             joinButton.onClick.AddListener(() => this.OnJoinServer?.Invoke(ipAddressField.text));
             leaveServerButton.onClick.AddListener(OnLeaveServer.Invoke);

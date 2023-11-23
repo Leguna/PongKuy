@@ -1,5 +1,4 @@
 using MainGame;
-using MirrorMultiplayerPong;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -42,7 +41,7 @@ namespace MainMenu
         {
             mainMenuPanel.SetActive(false);
             creditsPanel.SetActive(false);
-            gameManager.Init(false);
+            gameManager.Init(false, HomeButtonListener);
         }
 
         private void CreditsButtonListener()

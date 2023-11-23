@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using Mirror;
 using UnityEngine;
 
@@ -31,7 +30,7 @@ namespace MainGame
             var paddle = Instantiate(Resources.Load<PaddleComponent>("Prefabs/Paddle"));
             paddle.name = $"{type} Paddle";
             paddle.SetType(type, type);
-            paddle.SetUpController();
+            // paddle.SetUpController();
             paddles.Add(paddle);
             return paddle;
         }
@@ -47,11 +46,18 @@ namespace MainGame
         {
             SpawnPaddle(PlayerType.Left);
             SpawnPaddle(PlayerType.Right);
+            foreach (var paddle in paddles) paddle.SetUpController();
         }
 
         public void SetServePlayer(PlayerType playerType)
         {
-            
+        }
+
+        public void DestroyAll()
+        {
+            foreach (var paddle in paddles) Destroy(paddle.gameObject);
+            paddles.Clear();
+            Destroy(gameObject);
         }
     }
 
