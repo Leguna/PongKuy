@@ -9,29 +9,28 @@ namespace MainGame
     {
         [SerializeField] private MyNetworkManager networkManager;
         private PaddleSpawner paddleSpawner;
-        private BallController ballController;
+        private BallComponent ballComponent;
 
         [SerializeField] private Button backButton;
         private Action onCancel;
 
-        public void Init(bool isMultiplayer, Action OnCancel = null)
+        public void Init(bool isMultiplayer, Action onCancel = null)
         {
-            onCancel = OnCancel;
+            this.onCancel = onCancel;
             if (isMultiplayer)
-                MyNetworkManager.sin.Init(OnCancel);
+                MyNetworkManager.Sin.Init(onCancel);
             else
-                StartSinglePlayer(OnCancel);
+                StartSinglePlayer();
         }
 
-        private void StartSinglePlayer(Action onCancel)
+        private void StartSinglePlayer()
         {
             var paddleSpawnerPrefab = Resources.Load<PaddleSpawner>("Prefabs/PaddleSpawner");
             paddleSpawner = Instantiate(paddleSpawnerPrefab);
-            paddleSpawner.SpawnPaddleSinglePlayer();
-            ballController = Instantiate(Resources.Load<BallController>("Prefabs/Ball"));
-            ballController.Init(false);
-            ballController.ResetBallPosition(paddleSpawner.paddles[0].transform, PlayerType.Left);
-            paddleSpawner.paddles[0].onService += ballController.StartBallService;
+            ballComponent = Instantiate(Resources.Load<BallComponent>("Prefabs/Ball"));
+
+            paddleSpawner.SpawnPaddleSinglePlayer(ballComponent.StartBallService);
+            ballComponent.Init(false, paddleSpawner.paddles[0].transform, PlayerType.Left);
 
             backButton.gameObject.SetActive(true);
             backButton.onClick.RemoveAllListeners();
@@ -42,7 +41,7 @@ namespace MainGame
         {
             onCancel?.Invoke();
             paddleSpawner.DestroyAll();
-            Destroy(ballController.gameObject);
+            Destroy(ballComponent.gameObject);
             backButton.gameObject.SetActive(false);
         }
     }

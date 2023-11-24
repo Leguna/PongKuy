@@ -64,16 +64,7 @@ public partial class @PaddleInputAction: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""Touch"",
-                    ""type"": ""PassThrough"",
-                    ""id"": ""cf5b1f7d-81ea-41b2-8f3f-eeeecb223fcb"",
-                    ""expectedControlType"": """",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": true
-                },
-                {
-                    ""name"": ""TouchPhase"",
+                    ""name"": ""ServiceTouch"",
                     ""type"": ""Value"",
                     ""id"": ""8b262470-f1ee-41a6-8c40-81761839b4c4"",
                     ""expectedControlType"": """",
@@ -162,17 +153,6 @@ public partial class @PaddleInputAction: IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": """",
-                    ""id"": ""27eee13e-de61-4912-959d-23aa98d2d470"",
-                    ""path"": ""<Touchscreen>/primaryTouch/tap"",
-                    ""interactions"": ""MultiTap"",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""ServiceLeft"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
                     ""id"": ""b24a730e-5136-43fc-b03f-75b3b3f0065e"",
                     ""path"": ""<Keyboard>/rightCtrl"",
                     ""interactions"": """",
@@ -184,45 +164,12 @@ public partial class @PaddleInputAction: IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": """",
-                    ""id"": ""0df64cc8-c0e6-4f0b-b804-b722ac8bf96f"",
-                    ""path"": ""<Touchscreen>/primaryTouch/tap"",
-                    ""interactions"": ""MultiTap"",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""ServiceRight"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""1b985c82-61c7-4207-8b5f-5950a72f67c6"",
+                    ""id"": ""ff8f8f7f-2dfa-4974-b92c-826d67ab8642"",
                     ""path"": ""<Touchscreen>/position"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""Touch"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""9e14bab2-f31e-4203-9fc8-ea7dd12a30ec"",
-                    ""path"": ""<Touchscreen>/touch*/Press"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""Touch"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""c47a9bf8-9b28-477d-8bc9-e56f67d076d5"",
-                    ""path"": ""<Touchscreen>/primaryTouch"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""TouchPhase"",
+                    ""action"": ""ServiceTouch"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -237,8 +184,7 @@ public partial class @PaddleInputAction: IInputActionCollection2, IDisposable
         m_Player_PaddleRight = m_Player.FindAction("PaddleRight", throwIfNotFound: true);
         m_Player_ServiceLeft = m_Player.FindAction("ServiceLeft", throwIfNotFound: true);
         m_Player_ServiceRight = m_Player.FindAction("ServiceRight", throwIfNotFound: true);
-        m_Player_Touch = m_Player.FindAction("Touch", throwIfNotFound: true);
-        m_Player_TouchPhase = m_Player.FindAction("TouchPhase", throwIfNotFound: true);
+        m_Player_ServiceTouch = m_Player.FindAction("ServiceTouch", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -304,8 +250,7 @@ public partial class @PaddleInputAction: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_PaddleRight;
     private readonly InputAction m_Player_ServiceLeft;
     private readonly InputAction m_Player_ServiceRight;
-    private readonly InputAction m_Player_Touch;
-    private readonly InputAction m_Player_TouchPhase;
+    private readonly InputAction m_Player_ServiceTouch;
     public struct PlayerActions
     {
         private @PaddleInputAction m_Wrapper;
@@ -314,8 +259,7 @@ public partial class @PaddleInputAction: IInputActionCollection2, IDisposable
         public InputAction @PaddleRight => m_Wrapper.m_Player_PaddleRight;
         public InputAction @ServiceLeft => m_Wrapper.m_Player_ServiceLeft;
         public InputAction @ServiceRight => m_Wrapper.m_Player_ServiceRight;
-        public InputAction @Touch => m_Wrapper.m_Player_Touch;
-        public InputAction @TouchPhase => m_Wrapper.m_Player_TouchPhase;
+        public InputAction @ServiceTouch => m_Wrapper.m_Player_ServiceTouch;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -337,12 +281,9 @@ public partial class @PaddleInputAction: IInputActionCollection2, IDisposable
             @ServiceRight.started += instance.OnServiceRight;
             @ServiceRight.performed += instance.OnServiceRight;
             @ServiceRight.canceled += instance.OnServiceRight;
-            @Touch.started += instance.OnTouch;
-            @Touch.performed += instance.OnTouch;
-            @Touch.canceled += instance.OnTouch;
-            @TouchPhase.started += instance.OnTouchPhase;
-            @TouchPhase.performed += instance.OnTouchPhase;
-            @TouchPhase.canceled += instance.OnTouchPhase;
+            @ServiceTouch.started += instance.OnServiceTouch;
+            @ServiceTouch.performed += instance.OnServiceTouch;
+            @ServiceTouch.canceled += instance.OnServiceTouch;
         }
 
         private void UnregisterCallbacks(IPlayerActions instance)
@@ -359,12 +300,9 @@ public partial class @PaddleInputAction: IInputActionCollection2, IDisposable
             @ServiceRight.started -= instance.OnServiceRight;
             @ServiceRight.performed -= instance.OnServiceRight;
             @ServiceRight.canceled -= instance.OnServiceRight;
-            @Touch.started -= instance.OnTouch;
-            @Touch.performed -= instance.OnTouch;
-            @Touch.canceled -= instance.OnTouch;
-            @TouchPhase.started -= instance.OnTouchPhase;
-            @TouchPhase.performed -= instance.OnTouchPhase;
-            @TouchPhase.canceled -= instance.OnTouchPhase;
+            @ServiceTouch.started -= instance.OnServiceTouch;
+            @ServiceTouch.performed -= instance.OnServiceTouch;
+            @ServiceTouch.canceled -= instance.OnServiceTouch;
         }
 
         public void RemoveCallbacks(IPlayerActions instance)
@@ -388,7 +326,6 @@ public partial class @PaddleInputAction: IInputActionCollection2, IDisposable
         void OnPaddleRight(InputAction.CallbackContext context);
         void OnServiceLeft(InputAction.CallbackContext context);
         void OnServiceRight(InputAction.CallbackContext context);
-        void OnTouch(InputAction.CallbackContext context);
-        void OnTouchPhase(InputAction.CallbackContext context);
+        void OnServiceTouch(InputAction.CallbackContext context);
     }
 }

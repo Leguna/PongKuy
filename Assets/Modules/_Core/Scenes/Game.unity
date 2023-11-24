@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
+  m_IndirectSpecularColor: {r: 0.37311953, g: 0.38074014, b: 0.3587274, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -4332,6 +4332,7 @@ MonoBehaviour:
   playerSpawnMethod: 1
   spawnPrefabs:
   - {fileID: 8017360235498524160, guid: 8d8746cc4c98c2848b75637c96c70b26, type: 3}
+  - {fileID: 6832589429860852319, guid: ac3b6dc54bbc21b4794cfe998038f9c8, type: 3}
   snapshotSettings:
     bufferTimeMultiplier: 2
     bufferLimit: 32
@@ -4346,6 +4347,7 @@ MonoBehaviour:
   connectionQualityInterval: 3
   timeInterpolationGui: 0
   paddleSpawner: {fileID: 2212308133511766152, guid: 8d8746cc4c98c2848b75637c96c70b26, type: 3}
+  isMultiplayer: 0
   joinPanel: {fileID: 42110013}
 --- !u!114 &1341239682
 MonoBehaviour:

@@ -42,16 +42,7 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "Touch",
-                    "type": "PassThrough",
-                    "id": "cf5b1f7d-81ea-41b2-8f3f-eeeecb223fcb",
-                    "expectedControlType": "",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": true
-                },
-                {
-                    "name": "TouchPhase",
+                    "name": "ServiceTouch",
                     "type": "Value",
                     "id": "8b262470-f1ee-41a6-8c40-81761839b4c4",
                     "expectedControlType": "",
@@ -140,17 +131,6 @@
                 },
                 {
                     "name": "",
-                    "id": "27eee13e-de61-4912-959d-23aa98d2d470",
-                    "path": "<Touchscreen>/primaryTouch/tap",
-                    "interactions": "MultiTap",
-                    "processors": "",
-                    "groups": "",
-                    "action": "ServiceLeft",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
                     "id": "b24a730e-5136-43fc-b03f-75b3b3f0065e",
                     "path": "<Keyboard>/rightCtrl",
                     "interactions": "",
@@ -162,45 +142,12 @@
                 },
                 {
                     "name": "",
-                    "id": "0df64cc8-c0e6-4f0b-b804-b722ac8bf96f",
-                    "path": "<Touchscreen>/primaryTouch/tap",
-                    "interactions": "MultiTap",
-                    "processors": "",
-                    "groups": "",
-                    "action": "ServiceRight",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "1b985c82-61c7-4207-8b5f-5950a72f67c6",
+                    "id": "ff8f8f7f-2dfa-4974-b92c-826d67ab8642",
                     "path": "<Touchscreen>/position",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Touch",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "9e14bab2-f31e-4203-9fc8-ea7dd12a30ec",
-                    "path": "<Touchscreen>/touch*/Press",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Touch",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "c47a9bf8-9b28-477d-8bc9-e56f67d076d5",
-                    "path": "<Touchscreen>/primaryTouch",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "TouchPhase",
+                    "action": "ServiceTouch",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

@@ -9,16 +9,20 @@ namespace MirrorMultiplayerPong
 {
     public class MyNetworkManager : NetworkManager
     {
-        public static MyNetworkManager sin => singleton as MyNetworkManager;
+        public static MyNetworkManager Sin => singleton as MyNetworkManager;
 
+        private BallComponent ball;
         public PaddleSpawner paddleSpawner;
+        public bool isMultiplayer;
+
         [SerializeField] private JoinPanel joinPanel;
 
-        private Action OnCancel;
+        private Action onCancel;
 
-        public void Init(Action OnCancel)
+        public void Init(Action onCancel, bool isMultiplayer = true)
         {
-            this.OnCancel = OnCancel;
+            this.isMultiplayer = isMultiplayer;
+            this.onCancel = onCancel;
             joinPanel.Init(OnJoinServer, OnHostServer, OnLeaveServer, OnCancelEvent);
             ShowPanel();
         }
@@ -26,7 +30,7 @@ namespace MirrorMultiplayerPong
         private void OnCancelEvent()
         {
             joinPanel.Hide();
-            OnCancel?.Invoke();
+            onCancel?.Invoke();
             NetworkServer.Shutdown();
         }
 
@@ -54,18 +58,7 @@ namespace MirrorMultiplayerPong
             NetworkServer.RegisterHandler<CreatePaddleMessage>(OnCreatePaddle);
         }
 
-        public override void OnServerAddPlayer(NetworkConnectionToClient conn)
-        {
-            if (paddleSpawner.paddles.Count != 1) return;
-            var ball = Instantiate(Resources.Load<BallController>("Prefabs/Ball"));
-            NetworkServer.Spawn(ball.gameObject);
-            NetworkServer.AddPlayerForConnection(conn, ball.gameObject);
-        }
-
-        private void OnHostServer()
-        {
-            StartHost();
-        }
+        private void OnHostServer() => StartHost();
 
         private void OnJoinServer(string ip)
         {
@@ -91,14 +84,25 @@ namespace MirrorMultiplayerPong
         {
             StopClient();
             StopHost();
+            isMultiplayer = false;
             joinPanel.Show();
         }
 
         private void OnCreatePaddle(NetworkConnectionToClient conn, CreatePaddleMessage msg)
         {
-            var paddle = paddleSpawner.SpawnPaddle(paddleSpawner.GetSpawnType());
+            var paddle = paddleSpawner.SpawnPaddle(paddleSpawner.GetSpawnType(), false);
             NetworkServer.Spawn(paddle.gameObject);
             NetworkServer.AddPlayerForConnection(conn, paddle.gameObject);
+            SpawnBall();
+        }
+
+        private BallComponent SpawnBall()
+        {
+            if (paddleSpawner.paddles.Count != 2) return null;
+            ball = Instantiate(Resources.Load<BallComponent>("Prefabs/Ball"));
+            NetworkServer.Spawn(ball.gameObject);
+            ball.Init(true, paddleSpawner.paddles[0].transform, PlayerType.Left);
+            return ball;
         }
 
         public override void OnClientConnect()

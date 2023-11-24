@@ -17,13 +17,21 @@ namespace MainGame
         private new Rigidbody2D rigidbody2D;
         public bool isSinglePlayer = true;
 
-        private Camera camera;
+        private new Camera camera;
         private const int Speed = 10;
         private PlayerType keyPlayerPressed;
 
-        public Action onService;
+        public Action<PlayerType> onService;
 
         [SerializeField] private float xPosition = 7.5f;
+
+        public void Init(PlayerType playerType, bool isSinglePlayer = true, Action<PlayerType> onService = null)
+        {
+            this.onService = onService;
+            name = $"{playerType} Paddle";
+            SetType(playerType, playerType);
+            this.isSinglePlayer = isSinglePlayer;
+        }
 
         private void Awake()
         {
@@ -77,21 +85,10 @@ namespace MainGame
 
         private void ServiceLeft(InputAction.CallbackContext obj) => Service(PlayerType.Left);
 
-        public void Service(PlayerType playerType)
+        private void Service(PlayerType playerType)
         {
-            Debug.Log("Service called from " + playerType);
-            if (isSinglePlayer)
-            {
-                onService?.Invoke();
-                Debug.Log("Service on single player");
-            }
-            else
-            {
-                if (!isLocalPlayer) return;
-                var msg = new ServiceMessage();
-                NetworkClient.Send(msg);
-                Debug.Log("Service from client");
-            }
+            if (this.playerType != playerType) return;
+            onService?.Invoke(this.playerType);
         }
 
         private void MovePaddleLeft(InputAction.CallbackContext obj)
@@ -139,7 +136,6 @@ namespace MainGame
 
         private void DisableInput()
         {
-            Debug.Log(gameObject.name);
             if (!isLocalPlayer && !isSinglePlayer) return;
             inputAction.Player.PaddleRight.performed -= MovePaddleRight;
             inputAction.Player.PaddleRight.canceled -= MovePaddleRight;
@@ -151,9 +147,17 @@ namespace MainGame
         }
 
         private void OnDisable() => DisableInput();
+
+        public void SetListener(Action<PlayerType> startBallService) => onService = startBallService;
     }
 
     internal struct ServiceMessage : NetworkMessage
     {
+        public readonly PlayerType playerType;
+
+        public ServiceMessage(PlayerType playerType)
+        {
+            this.playerType = playerType;
+        }
     }
 }

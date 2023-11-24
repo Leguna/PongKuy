@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Mirror;
 using UnityEngine;
@@ -25,13 +26,11 @@ namespace MainGame
             };
         }
 
-        public PaddleComponent SpawnPaddle(PlayerType type)
+        public PaddleComponent SpawnPaddle(PlayerType type, bool isSinglePlayer, Action<PlayerType> onService = null)
         {
             var paddle = Instantiate(Resources.Load<PaddleComponent>("Prefabs/Paddle"));
-            paddle.name = $"{type} Paddle";
-            paddle.SetType(type, type);
-            // paddle.SetUpController();
             paddles.Add(paddle);
+            paddle.Init(type, isSinglePlayer, onService);
             return paddle;
         }
 
@@ -42,15 +41,11 @@ namespace MainGame
             paddles.Clear();
         }
 
-        public void SpawnPaddleSinglePlayer()
+        public void SpawnPaddleSinglePlayer(Action<PlayerType> onService = null)
         {
-            SpawnPaddle(PlayerType.Left);
-            SpawnPaddle(PlayerType.Right);
+            SpawnPaddle(PlayerType.Left, true, onService);
+            SpawnPaddle(PlayerType.Right, true, onService);
             foreach (var paddle in paddles) paddle.SetUpController();
-        }
-
-        public void SetServePlayer(PlayerType playerType)
-        {
         }
 
         public void DestroyAll()
