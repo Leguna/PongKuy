@@ -18,6 +18,7 @@ namespace MirrorMultiplayerPong
         [SerializeField] private JoinPanel joinPanel;
 
         private Action onCancel;
+        [SerializeField] private ScoreManager scoreManager;
 
         public void Init(Action onCancel, bool isMultiplayer = true)
         {
@@ -34,10 +35,27 @@ namespace MirrorMultiplayerPong
             NetworkServer.Shutdown();
         }
 
-        public override void OnClientDisconnect()
+        public override void OnStopServer()
         {
-            base.OnClientDisconnect();
-            joinPanel.Show();
+            base.OnStopServer();
+            NetworkServer.UnregisterHandler<CreatePaddleMessage>();
+        }
+
+        public override void OnServerConnect(NetworkConnectionToClient conn)
+        {
+            base.OnServerConnect(conn);
+            if (scoreManager) scoreManager.ShowScore();
+        }
+
+        public override void OnServerDisconnect(NetworkConnectionToClient conn)
+        {
+            base.OnServerDisconnect(conn);
+            if (ball) Destroy(ball.gameObject);
+            if (scoreManager)
+            {
+                scoreManager.ResetScore();
+                scoreManager.HideScore();
+            }
         }
 
         public override void OnStartHost()
@@ -56,9 +74,14 @@ namespace MirrorMultiplayerPong
             paddleSpawner = Instantiate(paddleSpawnerPrefab);
             NetworkServer.Spawn(paddleSpawner.gameObject);
             NetworkServer.RegisterHandler<CreatePaddleMessage>(OnCreatePaddle);
+            scoreManager = Instantiate(Resources.Load<ScoreManager>("Prefabs/ScoreManager"));
+            NetworkServer.Spawn(scoreManager.gameObject);
         }
 
-        private void OnHostServer() => StartHost();
+        private void OnHostServer()
+        {
+            StartHost();
+        }
 
         private void OnJoinServer(string ip)
         {
@@ -96,13 +119,17 @@ namespace MirrorMultiplayerPong
             SpawnBall();
         }
 
-        private BallComponent SpawnBall()
+        private void SpawnBall()
         {
-            if (paddleSpawner.paddles.Count != 2) return null;
+            if (paddleSpawner.paddles.Count != 2) return;
             ball = Instantiate(Resources.Load<BallComponent>("Prefabs/Ball"));
             NetworkServer.Spawn(ball.gameObject);
-            ball.Init(true, paddleSpawner.paddles[0].transform, PlayerType.Left);
-            return ball;
+            ball.Init(true, paddleSpawner.PaddleTransform, PlayerType.Left, OnGoal);
+        }
+
+        private void OnGoal(PlayerType playerGoal)
+        {
+            scoreManager.AddScore(playerGoal);
         }
 
         public override void OnClientConnect()
@@ -110,6 +137,17 @@ namespace MirrorMultiplayerPong
             base.OnClientConnect();
             var createPaddleMessage = new CreatePaddleMessage(paddleSpawner.GetSpawnType());
             NetworkClient.Send(createPaddleMessage);
+        }
+
+        public override void OnClientDisconnect()
+        {
+            base.OnClientDisconnect();
+            joinPanel.Show();
+        }
+
+        private void OnScoreBoardMessage(ScoreBoardMessage obj)
+        {
+            scoreManager.RpcSyncScore(scoreManager.scoreBoard, obj.scoreBoard);
         }
     }
 }

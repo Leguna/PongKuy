@@ -12,28 +12,35 @@ namespace MainGame
 
         public float startSpeed = 2f;
         public float speed = 4f;
-        private Rigidbody2D rigidbody2d;
+        [SerializeField] private Rigidbody2D rigidbody2d;
 
         private int wallBounceCount;
-        private const int wallBounceLimit = 3;
+        private const int WallBounceLimit = 3;
 
+        private Transform[] paddlesTransform;
         private PlayerType lastPlayerHit;
-        private Transform lastPlayerHitTransform;
         private float lastBallTouchTime;
-        private const float lastBallTouchTimeLimit = 3f;
-        private const float delayService = 3;
+        private const float LastBallTouchTimeLimit = 3f;
+        private const float DelayService = 3;
 
-        private Action<PlayerType> OnGoal;
+        private Action<PlayerType> onGoal;
 
-        public void Init(bool isMultiplayer, Transform paddleTransform, PlayerType playerType)
+        public void Init(bool isMultiplayer, Transform[] paddleTransform, PlayerType playerType,
+            Action<PlayerType> onGoal)
         {
+            lastPlayerHit = playerType;
+            paddlesTransform = paddleTransform;
+            this.onGoal = onGoal;
+            name = "Ball";
             TryGetComponent(out rigidbody2d);
             rigidbody2d.simulated = !isMultiplayer || isServer;
-            ResetBallPosition(paddleTransform, playerType);
+            ResetBallPosition(paddleTransform[0], playerType);
         }
 
         private void Update()
         {
+            if (!isServer && MyNetworkManager.Sin.isMultiplayer) return;
+            if (paddlesTransform == null) return;
             CheckBallPosition();
             MoveBallWithPaddle();
         }
@@ -50,18 +57,19 @@ namespace MainGame
         {
             if (transform.parent) return;
             lastBallTouchTime += Time.deltaTime;
-            if (lastBallTouchTime < lastBallTouchTimeLimit) return;
+            if (lastBallTouchTime < LastBallTouchTimeLimit) return;
+            lastPlayerHit = transform.position.x < 0 ? PlayerType.Right : PlayerType.Left;
             lastBallTouchTime = 0;
-            OnGoal?.Invoke(lastPlayerHit);
+            onGoal?.Invoke(lastPlayerHit);
 
-            ResetBallPosition(lastPlayerHitTransform, lastPlayerHit);
+            ResetBallPosition(paddlesTransform[(int)lastPlayerHit - 1], lastPlayerHit);
         }
 
         public void ResetBallPosition(Transform paddleTransform, PlayerType playerType)
         {
             if (!isServer && MyNetworkManager.Sin.isMultiplayer) return;
+            if (!paddleTransform) return;
             lastPlayerHit = playerType;
-            lastPlayerHitTransform = paddleTransform;
             var ballTransform = transform;
             ballTransform.SetParent(paddleTransform);
             var newOffset = new Vector3(offset.x * (playerType == PlayerType.Left ? -1 : 1), offset.y);
@@ -71,7 +79,7 @@ namespace MainGame
 
         private IEnumerator DelayedStartBallService(PlayerType playerType)
         {
-            yield return new WaitForSeconds(delayService);
+            yield return new WaitForSeconds(DelayService);
             StartBallService(playerType);
         }
 
@@ -81,7 +89,13 @@ namespace MainGame
             NetworkServer.RegisterHandler<ServiceMessage>(RpcServiceBall);
         }
 
-        private void RpcServiceBall(NetworkConnectionToClient conn, ServiceMessage msg)
+        public override void OnStopServer()
+        {
+            base.OnStopServer();
+            NetworkServer.UnregisterHandler<ServiceMessage>();
+        }
+
+        public void RpcServiceBall(NetworkConnectionToClient conn, ServiceMessage msg)
         {
             if (msg.playerType != lastPlayerHit) return;
             StartBallService(msg.playerType);
@@ -113,18 +127,19 @@ namespace MainGame
         {
             if (!col.gameObject.CompareTag("Wall")) return;
             wallBounceCount++;
-            if (wallBounceCount < wallBounceLimit) return;
+            if (wallBounceCount < WallBounceLimit) return;
+            if (paddlesTransform == null) return;
             wallBounceCount = 0;
             rigidbody2d.velocity = Vector2.zero;
-            ResetBallPosition(lastPlayerHitTransform, lastPlayerHit);
+            ResetBallPosition(paddlesTransform[(int)lastPlayerHit - 1], lastPlayerHit);
         }
 
         private void OnCollisionWithPaddle(Collision2D col)
         {
+            if (!isServer && MyNetworkManager.Sin.isMultiplayer) return;
             if (!col.transform.TryGetComponent<PaddleComponent>(out var paddleTouch)) return;
             wallBounceCount = 0;
             lastPlayerHit = paddleTouch.playerType;
-            lastPlayerHitTransform = paddleTouch.transform;
             var y = HitFactor(transform.position,
                 col.transform.position,
                 col.collider.bounds.size.y);

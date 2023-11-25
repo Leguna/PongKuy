@@ -7,18 +7,19 @@ namespace MainGame
 {
     public class GameManager : MonoBehaviour
     {
-        [SerializeField] private MyNetworkManager networkManager;
         private PaddleSpawner paddleSpawner;
         private BallComponent ballComponent;
+        [SerializeField] private ScoreManager scoreManager;
 
         [SerializeField] private Button backButton;
-        private Action onCancel;
+        private Action backToMenu;
 
-        public void Init(bool isMultiplayer, Action onCancel = null)
+        public void Init(bool isMultiplayer, Action backToMenu = null)
         {
-            this.onCancel = onCancel;
+            this.backToMenu = backToMenu;
+            MyNetworkManager.Sin.isMultiplayer = isMultiplayer;
             if (isMultiplayer)
-                MyNetworkManager.Sin.Init(onCancel);
+                MyNetworkManager.Sin.Init(backToMenu);
             else
                 StartSinglePlayer();
         }
@@ -28,20 +29,37 @@ namespace MainGame
             var paddleSpawnerPrefab = Resources.Load<PaddleSpawner>("Prefabs/PaddleSpawner");
             paddleSpawner = Instantiate(paddleSpawnerPrefab);
             ballComponent = Instantiate(Resources.Load<BallComponent>("Prefabs/Ball"));
+            scoreManager = Instantiate(Resources.Load<ScoreManager>("Prefabs/ScoreManager"));
 
+            scoreManager.Init(OnGameOver);
             paddleSpawner.SpawnPaddleSinglePlayer(ballComponent.StartBallService);
-            ballComponent.Init(false, paddleSpawner.paddles[0].transform, PlayerType.Left);
+            ballComponent.Init(false, paddleSpawner.PaddleTransform, PlayerType.Left, scoreManager.AddScore);
 
             backButton.gameObject.SetActive(true);
             backButton.onClick.RemoveAllListeners();
             backButton.onClick.AddListener(OnExitSinglePlayer);
         }
 
+        private void OnGameOver(ScoreBoard obj)
+        {
+            if (MyNetworkManager.Sin.isMultiplayer)
+            {
+                Debug.Log("Multiplayer Game Over");
+            }
+            else
+            {
+                Debug.Log("Single Player Game Over");
+            }
+
+            Debug.Log("Game Over P1: " + obj.leftScore.score + " P2: " + obj.rightScore.score);
+        }
+
         private void OnExitSinglePlayer()
         {
-            onCancel?.Invoke();
+            backToMenu?.Invoke();
             paddleSpawner.DestroyAll();
             Destroy(ballComponent.gameObject);
+            Destroy(scoreManager.gameObject);
             backButton.gameObject.SetActive(false);
         }
     }

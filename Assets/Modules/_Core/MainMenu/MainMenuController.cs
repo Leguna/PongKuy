@@ -22,16 +22,17 @@ namespace MainMenu
             creditsButton.onClick.AddListener(CreditsButtonListener);
             quitButton.onClick.AddListener(QuitGameListener);
             multiplayerButton.onClick.AddListener(MultiplayerButtonListener);
+            Home();
         }
 
         private void MultiplayerButtonListener()
         {
             creditsPanel.SetActive(false);
             mainMenuPanel.SetActive(false);
-            gameManager.Init(true, HomeButtonListener);
+            gameManager.Init(true, Home);
         }
 
-        private void HomeButtonListener()
+        private void Home()
         {
             creditsPanel.SetActive(false);
             mainMenuPanel.SetActive(true);
@@ -41,7 +42,7 @@ namespace MainMenu
         {
             mainMenuPanel.SetActive(false);
             creditsPanel.SetActive(false);
-            gameManager.Init(false, HomeButtonListener);
+            gameManager.Init(false, Home);
         }
 
         private void CreditsButtonListener()

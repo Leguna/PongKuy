@@ -228,3 +228,7 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
+  playerType: 0
+  rigidbody2D: {fileID: 5815655058951830597}
+  isSinglePlayer: 0
+  xPosition: 7.5

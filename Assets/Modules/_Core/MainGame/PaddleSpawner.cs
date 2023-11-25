@@ -8,6 +8,7 @@ namespace MainGame
     public class PaddleSpawner : NetworkBehaviour
     {
         public List<PaddleComponent> paddles;
+        public Transform[] PaddleTransform => paddles.ConvertAll(paddle => paddle.transform).ToArray();
 
         public override void OnStartServer()
         {
@@ -30,7 +31,7 @@ namespace MainGame
         {
             var paddle = Instantiate(Resources.Load<PaddleComponent>("Prefabs/Paddle"));
             paddles.Add(paddle);
-            paddle.Init(type, isSinglePlayer, onService);
+            paddle.Init(type, isSinglePlayer, onService, Remove);
             return paddle;
         }
 
@@ -52,7 +53,13 @@ namespace MainGame
         {
             foreach (var paddle in paddles) Destroy(paddle.gameObject);
             paddles.Clear();
-            Destroy(gameObject);
+            if (gameObject) Destroy(gameObject);
+        }
+
+        public void Remove(PaddleComponent paddle)
+        {
+            paddles.Remove(paddle);
+            Destroy(paddle.gameObject);
         }
     }
 

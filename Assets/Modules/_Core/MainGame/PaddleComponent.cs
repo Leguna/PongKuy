@@ -14,20 +14,23 @@ namespace MainGame
         private NetworkTransformReliable transformIdentity;
         [SyncVar(hook = nameof(SetType))] public PlayerType playerType;
         private SpriteRenderer spriteRenderer;
-        private new Rigidbody2D rigidbody2D;
-        public bool isSinglePlayer = true;
+        [SerializeField] private new Rigidbody2D rigidbody2D;
+        [SyncVar] public bool isSinglePlayer;
 
         private new Camera camera;
         private const int Speed = 10;
         private PlayerType keyPlayerPressed;
 
         public Action<PlayerType> onService;
+        public Action<PaddleComponent> onDisconnect;
 
         [SerializeField] private float xPosition = 7.5f;
 
-        public void Init(PlayerType playerType, bool isSinglePlayer = true, Action<PlayerType> onService = null)
+        public void Init(PlayerType playerType, bool isSinglePlayer = false, Action<PlayerType> onService = null,
+            Action<PaddleComponent> onDisconnect = null)
         {
             this.onService = onService;
+            this.onDisconnect = onDisconnect;
             name = $"{playerType} Paddle";
             SetType(playerType, playerType);
             this.isSinglePlayer = isSinglePlayer;
@@ -44,7 +47,9 @@ namespace MainGame
 
         public void SetUpController()
         {
+            // Don't set up controller if it's not local player
             if (!isLocalPlayer && !isSinglePlayer) return;
+
             transformIdentity.enabled = true;
             inputAction = new PaddleInputAction();
             inputAction.Enable();
@@ -53,13 +58,9 @@ namespace MainGame
             inputAction.Player.PaddleLeft.canceled += MovePaddleLeft;
             inputAction.Player.ServiceLeft.performed += ServiceLeft;
 
-            if (isSinglePlayer)
-                if (playerType != PlayerType.Right)
-                    return;
-
-            inputAction.Player.ServiceRight.performed += ServiceRight;
             inputAction.Player.PaddleRight.performed += MovePaddleRight;
             inputAction.Player.PaddleRight.canceled += MovePaddleRight;
+            inputAction.Player.ServiceRight.performed += ServiceRight;
         }
 
         private void Update()
@@ -87,8 +88,9 @@ namespace MainGame
 
         private void Service(PlayerType playerType)
         {
-            if (this.playerType != playerType) return;
-            onService?.Invoke(this.playerType);
+            if (this.playerType != playerType && isSinglePlayer) return;
+            onService?.Invoke(playerType);
+            if (!isSinglePlayer) NetworkClient.Send(new ServiceMessage(this.playerType));
         }
 
         private void MovePaddleLeft(InputAction.CallbackContext obj)
@@ -132,11 +134,13 @@ namespace MainGame
         public override void OnStopClient()
         {
             DisableInput();
+            onDisconnect?.Invoke(this);
         }
 
         private void DisableInput()
         {
             if (!isLocalPlayer && !isSinglePlayer) return;
+            if (inputAction == null) return;
             inputAction.Player.PaddleRight.performed -= MovePaddleRight;
             inputAction.Player.PaddleRight.canceled -= MovePaddleRight;
             inputAction.Player.PaddleLeft.performed -= MovePaddleLeft;
@@ -147,11 +151,9 @@ namespace MainGame
         }
 
         private void OnDisable() => DisableInput();
-
-        public void SetListener(Action<PlayerType> startBallService) => onService = startBallService;
     }
 
-    internal struct ServiceMessage : NetworkMessage
+    public struct ServiceMessage : NetworkMessage
     {
         public readonly PlayerType playerType;
 
