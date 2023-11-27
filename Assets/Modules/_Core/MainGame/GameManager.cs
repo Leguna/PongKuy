@@ -9,7 +9,7 @@ namespace MainGame
     {
         private PaddleSpawner paddleSpawner;
         private BallComponent ballComponent;
-        [SerializeField] private ScoreManager scoreManager;
+        private ScoreManager scoreManager;
 
         [SerializeField] private Button backButton;
         private Action backToMenu;
@@ -42,15 +42,7 @@ namespace MainGame
 
         private void OnGameOver(ScoreBoard obj)
         {
-            if (MyNetworkManager.Sin.isMultiplayer)
-            {
-                Debug.Log("Multiplayer Game Over");
-            }
-            else
-            {
-                Debug.Log("Single Player Game Over");
-            }
-
+            Debug.Log(MyNetworkManager.Sin.isMultiplayer ? "Multiplayer Game Over" : "Single Player Game Over");
             Debug.Log("Game Over P1: " + obj.leftScore.score + " P2: " + obj.rightScore.score);
         }
 

@@ -33,7 +33,7 @@ namespace MirrorMultiplayerPong
         public void SetIP(string ip)
         {
             ipAddressView.gameObject.SetActive(true);
-            ipAddressView.text = $"Local IP Address: {ip}";
+            ipAddressView.text = $"Local IP Address: {ip}:7777";
         }
 
         public void Show()
