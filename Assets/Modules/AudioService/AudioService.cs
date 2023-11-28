@@ -7,7 +7,10 @@ public class AudioService : SingletonMonoBehaviour<AudioService>
     public enum AudioType
     {
         Click,
-        Hover
+        Hover,
+        Wall,
+        Paddle,
+        Win,
     }
 
     [SerializeField] private AudioSource audioSource;
@@ -18,11 +21,17 @@ public class AudioService : SingletonMonoBehaviour<AudioService>
     {
         var clickAudioClip = Resources.Load<AudioClip>("Audio/click");
         var hoverAudioClip = Resources.Load<AudioClip>("Audio/hover");
+        var wallAudioClip = Resources.Load<AudioClip>("Audio/wall");
+        var paddleAudioClip = Resources.Load<AudioClip>("Audio/paddle");
+        var winAudioClip = Resources.Load<AudioClip>("Audio/win");
 
         audioClips = new Dictionary<string, AudioClip>
         {
             { "click", clickAudioClip },
-            { "hover", hoverAudioClip }
+            { "hover", hoverAudioClip },
+            { "wall", wallAudioClip },
+            { "paddle", paddleAudioClip },
+            { "win", winAudioClip },
         };
     }
 
@@ -48,8 +57,5 @@ public class AudioService : SingletonMonoBehaviour<AudioService>
         PlayerPrefs.SetFloat("SFXVolume", volume);
     }
 
-    public float GetVolume()
-    {
-        return audioSource.volume;
-    }
+    public float GetVolume() => audioSource.volume;
 }

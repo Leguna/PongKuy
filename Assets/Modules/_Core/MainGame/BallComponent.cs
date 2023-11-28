@@ -22,12 +22,14 @@ namespace MainGame
         private float lastBallTouchTime;
         private const float LastBallTouchTimeLimit = 3f;
         private const float DelayService = 3;
+        private AudioService audioService;
 
         private Action<PlayerType> onGoal;
 
         public void Init(bool isMultiplayer, Transform[] paddleTransform, PlayerType playerType,
             Action<PlayerType> onGoal)
         {
+            audioService = AudioService.Instance;
             lastPlayerHit = playerType;
             paddlesTransform = paddleTransform;
             this.onGoal = onGoal;
@@ -61,7 +63,7 @@ namespace MainGame
             lastPlayerHit = transform.position.x < 0 ? PlayerType.Right : PlayerType.Left;
             lastBallTouchTime = 0;
             onGoal?.Invoke(lastPlayerHit);
-
+            audioService.PlayAudio(AudioService.AudioType.Win);
             ResetBallPosition(paddlesTransform[(int)lastPlayerHit - 1], lastPlayerHit);
         }
 
@@ -127,6 +129,7 @@ namespace MainGame
         {
             if (!col.gameObject.CompareTag("Wall")) return;
             wallBounceCount++;
+            audioService.PlayAudio(AudioService.AudioType.Wall);
             if (wallBounceCount < WallBounceLimit) return;
             if (paddlesTransform == null) return;
             wallBounceCount = 0;
@@ -138,6 +141,7 @@ namespace MainGame
         {
             if (!isServer && MyNetworkManager.Sin.isMultiplayer) return;
             if (!col.transform.TryGetComponent<PaddleComponent>(out var paddleTouch)) return;
+            audioService.PlayAudio(AudioService.AudioType.Paddle);
             wallBounceCount = 0;
             lastPlayerHit = paddleTouch.playerType;
             var y = HitFactor(transform.position,
