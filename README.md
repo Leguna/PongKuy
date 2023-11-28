@@ -1,6 +1,8 @@
 # PongKuy - Multiplayer Pong 2D
 Catatan Rilis PongKuy v1.0 - "Awal Petualangan"
 
+[<img alt="alt_text" width="300" src="https://user-images.githubusercontent.com/12116766/195317526-bfaf2f3e-2968-43cf-8df8-6ebdc86df4f0.png" />](https://play.google.com/store/apps/developer?id=Arksana+Studio)
+
 Terima kasih telah memilih PongKuy! Versi ini adalah permulaan dari petualangan seru Anda dalam dunia permainan Pong yang kami cintai.
 
 Apa yang Baru:
