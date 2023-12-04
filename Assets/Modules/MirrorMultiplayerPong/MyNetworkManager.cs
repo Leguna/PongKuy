@@ -62,7 +62,7 @@ namespace MirrorMultiplayerPong
         {
             base.OnStartHost();
             joinPanel.Hide();
-            var ipv4 = IPManager.GetIP(ADDRESSFAM.IPv4);
+            var ipv4 = IPManager.GetLocalIPAddress();
             joinPanel.SetIP(ipv4);
         }
 
